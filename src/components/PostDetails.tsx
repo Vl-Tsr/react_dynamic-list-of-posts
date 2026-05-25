@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Loader } from './Loader';
 import { NewCommentForm } from './NewCommentForm';
 import { Post } from '../types/Post';
@@ -9,6 +10,7 @@ import { FieldErrors } from '../types/FieldErrors';
 type Props = {
   selectedPost: Post;
   hasCommentsError: boolean;
+  hasDeleteError: boolean;
   isCommentsLoading: boolean;
   postComments: Comment[];
   onWriteComment: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,6 +28,7 @@ type Props = {
 export const PostDetails: React.FC<Props> = ({
   selectedPost,
   hasCommentsError,
+  hasDeleteError,
   isCommentsLoading,
   postComments,
   onWriteComment,
@@ -55,6 +58,12 @@ export const PostDetails: React.FC<Props> = ({
         {hasCommentsError && (
           <div className="notification is-danger" data-cy="CommentsError">
             Something went wrong
+          </div>
+        )}
+
+        {hasDeleteError && (
+          <div className="notification is-danger" data-cy="DeleteError">
+            Failed to delete comment. Please try again.
           </div>
         )}
 
@@ -122,4 +131,43 @@ export const PostDetails: React.FC<Props> = ({
       </div>
     </div>
   );
+};
+
+PostDetails.propTypes = {
+  selectedPost: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    userId: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+  }).isRequired,
+  hasCommentsError: PropTypes.bool.isRequired,
+  hasDeleteError: PropTypes.bool.isRequired,
+  isCommentsLoading: PropTypes.bool.isRequired,
+  postComments: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      postId: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      email: PropTypes.string.isRequired,
+      body: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  onWriteComment: PropTypes.func.isRequired,
+  isFormShown: PropTypes.bool.isRequired,
+  isFormLoading: PropTypes.bool.isRequired,
+  onSubmitForm: PropTypes.func.isRequired,
+  formFiedls: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+  }).isRequired,
+  onFieldsChange: PropTypes.func.isRequired,
+  fieldErrors: PropTypes.shape({
+    name: PropTypes.bool.isRequired,
+    email: PropTypes.bool.isRequired,
+    body: PropTypes.bool.isRequired,
+  }).isRequired,
+  onClearForm: PropTypes.func.isRequired,
+  onDeleteComment: PropTypes.func.isRequired,
+  setFieldErrors: PropTypes.func.isRequired,
 };

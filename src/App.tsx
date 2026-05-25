@@ -36,6 +36,7 @@ export const App = () => {
 
   const [hasCommentsError, setHasCommentsError] = useState(false);
   const [hasPostError, setHasPostError] = useState(false);
+  const [hasDeleteError, setHasDeleteError] = useState(false);
 
   const initFields: FormFields = {
     name: '',
@@ -140,11 +141,20 @@ export const App = () => {
 
   const handleDeleteComment = async (id: number) => {
     setPostComments(comments => comments.filter(comment => comment.id !== id));
+    setHasDeleteError(false);
 
     try {
       await deleteComment(id);
     } catch {
-      // optimistic update: ignore delete failure
+      setHasDeleteError(true);
+      // Restore the deleted comment to the list
+      setPostComments(comments => {
+        const deletedComment = postComments.find(comment => comment.id === id);
+        if (deletedComment) {
+          return [...comments, deletedComment].sort((a, b) => a.id - b.id);
+        }
+        return comments;
+      });
     }
   };
 
@@ -231,6 +241,7 @@ export const App = () => {
                 <PostDetails
                   selectedPost={selectedPost}
                   hasCommentsError={hasCommentsError}
+                  hasDeleteError={hasDeleteError}
                   isCommentsLoading={isCommentsLoading}
                   postComments={postComments}
                   onWriteComment={setIsFormShown}

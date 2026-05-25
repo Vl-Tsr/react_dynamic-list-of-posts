@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { FormFields } from '../types/FormFields';
 import { FieldErrors } from '../types/FieldErrors';
@@ -152,4 +153,22 @@ export const NewCommentForm: React.FC<Props> = ({
       </div>
     </form>
   );
+};
+
+NewCommentForm.propTypes = {
+  isFormLoading: PropTypes.bool.isRequired,
+  onSubmitForm: PropTypes.func.isRequired,
+  formFiedls: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+  }).isRequired,
+  onFieldsChange: PropTypes.func.isRequired,
+  fieldErrors: PropTypes.shape({
+    name: PropTypes.bool.isRequired,
+    email: PropTypes.bool.isRequired,
+    body: PropTypes.bool.isRequired,
+  }).isRequired,
+  onClearForm: PropTypes.func.isRequired,
+  setFieldErrors: PropTypes.func.isRequired,
 };
