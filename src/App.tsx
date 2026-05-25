@@ -150,9 +150,11 @@ export const App = () => {
       // Restore the deleted comment to the list
       setPostComments(comments => {
         const deletedComment = postComments.find(comment => comment.id === id);
+
         if (deletedComment) {
           return [...comments, deletedComment].sort((a, b) => a.id - b.id);
         }
+
         return comments;
       });
     }
