@@ -1,4 +1,4 @@
-export type FormErrors = {
+export type FieldErrors = {
   name: boolean;
   email: boolean;
   body: boolean;

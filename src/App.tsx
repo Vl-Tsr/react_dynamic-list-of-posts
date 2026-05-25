@@ -19,7 +19,7 @@ import {
 import { Post } from './types/Post';
 import { Comment } from './types/Comment';
 import { FormFields } from './types/FormFields';
-import { FormErrors } from './types/FormErrors';
+import { FieldErrors } from './types/FieldErrors';
 
 export const App = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -43,17 +43,17 @@ export const App = () => {
     body: '',
   };
 
-  const initFormErrors: FormErrors = {
+  const initFormErrors: FieldErrors = {
     name: false,
     email: false,
     body: false,
   };
 
-  const [formFiedls, setFormFields] = useState<FormFields>(initFields);
-  const [formErrors, setFormErrors] = useState<FormErrors>(initFormErrors);
+  const [formFields, setFormFields] = useState<FormFields>(initFields);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>(initFormErrors);
 
   const handleClearForm = (type: 'full' | 'part') => {
-    setFormErrors(initFormErrors);
+    setFieldErrors(initFormErrors);
 
     switch (type) {
       case 'full':
@@ -68,29 +68,31 @@ export const App = () => {
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setFormErrors({
-      name: !formFiedls.name,
-      email: !formFiedls.email,
-      body: !formFiedls.body,
+    setFieldErrors({
+      name: !formFields.name,
+      email: !formFields.email,
+      body: !formFields.body,
     });
 
-    if (!formFiedls.name || !formFiedls.email || !formFiedls.body) {
+    if (!formFields.name || !formFields.email || !formFields.body) {
       return;
     }
 
+    setHasCommentsError(false);
     setIsFormLoading(true);
 
     try {
       const comment = await postComment({
         postId: selectedPost?.id || 0,
-        name: formFiedls.name,
-        email: formFiedls.email,
-        body: formFiedls.body,
+        name: formFields.name,
+        email: formFields.email,
+        body: formFields.body,
       });
 
       handleClearForm('part');
       setPostComments(prev => [...prev, comment]);
-    } catch (error) {
+    } catch {
+      setHasCommentsError(true);
     } finally {
       setIsFormLoading(false);
     }
@@ -99,6 +101,7 @@ export const App = () => {
   const handleSelectUser = async (user: User) => {
     setSelectedUser(user);
     setIsPostsLoading(true);
+    setHasPostError(false);
     setUserPosts([]);
     setSelectedPost(null);
 
@@ -106,7 +109,7 @@ export const App = () => {
       const data = await getUserPosts(user.id);
 
       setUserPosts(data);
-    } catch (error) {
+    } catch {
       setHasPostError(true);
     } finally {
       setIsPostsLoading(false);
@@ -122,12 +125,13 @@ export const App = () => {
 
     setIsFormShown(false);
     setIsCommentsLoading(true);
+    setHasCommentsError(false);
 
     try {
       const data = await getPostComments(id);
 
       setPostComments(data);
-    } catch (error) {
+    } catch {
       setHasCommentsError(true);
     } finally {
       setIsCommentsLoading(false);
@@ -135,13 +139,12 @@ export const App = () => {
   };
 
   const handleDeleteComment = async (id: number) => {
+    setPostComments(comments => comments.filter(comment => comment.id !== id));
+
     try {
       await deleteComment(id);
-      setPostComments(comments =>
-        comments.filter(comment => comment.id !== id),
-      );
-    } catch (error) {
-    } finally {
+    } catch {
+      // optimistic update: ignore delete failure
     }
   };
 
@@ -151,7 +154,9 @@ export const App = () => {
         const data = await getUsers();
 
         setUsers(data);
-      } catch (error) {}
+      } catch {
+        setHasPostError(true);
+      }
     };
 
     loadUsers();
@@ -232,11 +237,12 @@ export const App = () => {
                   isFormShown={isFormShown}
                   isFormLoading={isFormLoading}
                   onSubmitForm={handleSubmitForm}
-                  formFiedls={formFiedls}
+                  formFiedls={formFields}
                   onFieldsChange={setFormFields}
-                  formErrors={formErrors}
+                  fieldErrors={fieldErrors}
                   onClearForm={handleClearForm}
                   onDeleteComment={handleDeleteComment}
+                  setFieldErrors={setFieldErrors}
                 />
               )}
             </div>

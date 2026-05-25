@@ -4,7 +4,7 @@ import { NewCommentForm } from './NewCommentForm';
 import { Post } from '../types/Post';
 import { Comment } from '../types/Comment';
 import { FormFields } from '../types/FormFields';
-import { FormErrors } from '../types/FormErrors';
+import { FieldErrors } from '../types/FieldErrors';
 
 type Props = {
   selectedPost: Post;
@@ -17,9 +17,10 @@ type Props = {
   onSubmitForm: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
   formFiedls: FormFields;
   onFieldsChange: React.Dispatch<React.SetStateAction<FormFields>>;
-  formErrors: FormErrors;
+  fieldErrors: FieldErrors;
   onClearForm: (type: 'full' | 'part') => void;
   onDeleteComment: (id: number) => Promise<void>;
+  setFieldErrors: React.Dispatch<React.SetStateAction<FieldErrors>>;
 };
 
 export const PostDetails: React.FC<Props> = ({
@@ -33,91 +34,91 @@ export const PostDetails: React.FC<Props> = ({
   onSubmitForm,
   formFiedls,
   onFieldsChange,
-  formErrors,
+  fieldErrors,
   onClearForm,
   onDeleteComment,
+  setFieldErrors,
 }) => {
   return (
     <div className="content" data-cy="PostDetails">
-      <div className="content" data-cy="PostDetails">
-        <div className="block">
-          <h2 data-cy="PostTitle">
-            #{selectedPost.id}: {selectedPost.title}
-          </h2>
+      <div className="block">
+        <h2 data-cy="PostTitle">
+          #{selectedPost.id}: {selectedPost.title}
+        </h2>
 
-          <p data-cy="PostBody">{selectedPost.body}</p>
-        </div>
+        <p data-cy="PostBody">{selectedPost.body}</p>
+      </div>
 
-        <div className="block">
-          {isCommentsLoading && <Loader />}
+      <div className="block">
+        {isCommentsLoading && <Loader />}
 
-          {hasCommentsError && (
-            <div className="notification is-danger" data-cy="CommentsError">
-              Something went wrong
-            </div>
-          )}
+        {hasCommentsError && (
+          <div className="notification is-danger" data-cy="CommentsError">
+            Something went wrong
+          </div>
+        )}
 
-          {!isCommentsLoading && !postComments.length && !hasCommentsError && (
-            <p className="title is-4" data-cy="NoCommentsMessage">
-              No comments yet
-            </p>
-          )}
+        {!isCommentsLoading && !postComments.length && !hasCommentsError && (
+          <p className="title is-4" data-cy="NoCommentsMessage">
+            No comments yet
+          </p>
+        )}
 
-          <p className="title is-4">Comments:</p>
+        {!isCommentsLoading && !hasCommentsError && (
+          <>
+            {postComments.length > 0 && <p className="title is-4">Comments:</p>}
 
-          {!isCommentsLoading && (
-            <>
-              {postComments.map(comment => (
-                <article
-                  key={comment.id}
-                  className="message is-small"
-                  data-cy="Comment"
-                >
-                  <div className="message-header">
-                    <a href={`mailto:${comment.email}`} data-cy="CommentAuthor">
-                      {comment.name}
-                    </a>
-                    <button
-                      onClick={() => onDeleteComment(comment.id)}
-                      data-cy="CommentDelete"
-                      type="button"
-                      className="delete is-small"
-                      aria-label="delete"
-                    >
-                      delete button
-                    </button>
-                  </div>
+            {postComments.map(comment => (
+              <article
+                key={comment.id}
+                className="message is-small"
+                data-cy="Comment"
+              >
+                <div className="message-header">
+                  <a href={`mailto:${comment.email}`} data-cy="CommentAuthor">
+                    {comment.name}
+                  </a>
+                  <button
+                    onClick={() => onDeleteComment(comment.id)}
+                    data-cy="CommentDelete"
+                    type="button"
+                    className="delete is-small"
+                    aria-label="delete"
+                  >
+                    delete button
+                  </button>
+                </div>
 
-                  <div className="message-body" data-cy="CommentBody">
-                    {comment.body}
-                  </div>
-                </article>
-              ))}
+                <div className="message-body" data-cy="CommentBody">
+                  {comment.body}
+                </div>
+              </article>
+            ))}
 
-              {isFormShown && !hasCommentsError && (
-                <NewCommentForm
-                  isFormLoading={isFormLoading}
-                  onSubmitForm={onSubmitForm}
-                  formFiedls={formFiedls}
-                  onFieldsChange={onFieldsChange}
-                  formErrors={formErrors}
-                  onClearForm={onClearForm}
-                />
-              )}
+            {isFormShown && !hasCommentsError && (
+              <NewCommentForm
+                isFormLoading={isFormLoading}
+                onSubmitForm={onSubmitForm}
+                formFiedls={formFiedls}
+                onFieldsChange={onFieldsChange}
+                fieldErrors={fieldErrors}
+                onClearForm={onClearForm}
+                setFieldErrors={setFieldErrors}
+              />
+            )}
 
-              {!isFormShown && !hasCommentsError && (
-                <button
-                  onClick={() => onWriteComment(true)}
-                  data-cy="WriteCommentButton"
-                  type="button"
-                  className="button is-link"
-                >
-                  Write a comment
-                </button>
-              )}
-            </>
-          )}
-        </div>
+            {!isFormShown && !hasCommentsError && (
+              <button
+                onClick={() => onWriteComment(true)}
+                data-cy="WriteCommentButton"
+                type="button"
+                className="button is-link"
+              >
+                Write a comment
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

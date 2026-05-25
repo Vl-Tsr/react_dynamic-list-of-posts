@@ -1,15 +1,16 @@
 import cn from 'classnames';
 import React from 'react';
 import { FormFields } from '../types/FormFields';
-import { FormErrors } from '../types/FormErrors';
+import { FieldErrors } from '../types/FieldErrors';
 
 type Props = {
   isFormLoading: boolean;
   onSubmitForm: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
   formFiedls: FormFields;
   onFieldsChange: React.Dispatch<React.SetStateAction<FormFields>>;
-  formErrors: FormErrors;
+  fieldErrors: FieldErrors;
   onClearForm: (type: 'full' | 'part') => void;
+  setFieldErrors: React.Dispatch<React.SetStateAction<FieldErrors>>;
 };
 
 export const NewCommentForm: React.FC<Props> = ({
@@ -17,8 +18,9 @@ export const NewCommentForm: React.FC<Props> = ({
   onSubmitForm,
   formFiedls,
   onFieldsChange,
-  formErrors,
+  fieldErrors,
   onClearForm,
+  setFieldErrors,
 }) => {
   return (
     <form onSubmit={e => onSubmitForm(e)} data-cy="NewCommentForm">
@@ -30,21 +32,22 @@ export const NewCommentForm: React.FC<Props> = ({
         <div className="control has-icons-left has-icons-right">
           <input
             value={formFiedls.name}
-            onChange={e =>
-              onFieldsChange(prev => ({ ...prev, name: e.target.value }))
-            }
+            onChange={e => {
+              onFieldsChange(prev => ({ ...prev, name: e.target.value }));
+              setFieldErrors(prev => ({ ...prev, name: false }));
+            }}
             type="text"
             name="name"
             id="comment-author-name"
             placeholder="Name Surname"
-            className={cn('input', formErrors.name && 'is-danger')}
+            className={cn('input', fieldErrors.name && 'is-danger')}
           />
 
           <span className="icon is-small is-left">
             <i className="fas fa-user" />
           </span>
 
-          {formErrors.name && (
+          {fieldErrors.name && (
             <span
               className="icon is-small is-right has-text-danger"
               data-cy="ErrorIcon"
@@ -54,7 +57,7 @@ export const NewCommentForm: React.FC<Props> = ({
           )}
         </div>
 
-        {formErrors.name && (
+        {fieldErrors.name && (
           <p className="help is-danger" data-cy="ErrorMessage">
             Name is required
           </p>
@@ -69,21 +72,22 @@ export const NewCommentForm: React.FC<Props> = ({
         <div className="control has-icons-left has-icons-right">
           <input
             value={formFiedls.email}
-            onChange={e =>
-              onFieldsChange(prev => ({ ...prev, email: e.target.value }))
-            }
-            type="text"
+            onChange={e => {
+              onFieldsChange(prev => ({ ...prev, email: e.target.value }));
+              setFieldErrors(prev => ({ ...prev, email: false }));
+            }}
+            type="email"
             name="email"
             id="comment-author-email"
             placeholder="email@test.com"
-            className={cn('input', formErrors.email && 'is-danger')}
+            className={cn('input', fieldErrors.email && 'is-danger')}
           />
 
           <span className="icon is-small is-left">
             <i className="fas fa-envelope" />
           </span>
 
-          {formErrors.email && (
+          {fieldErrors.email && (
             <span
               className="icon is-small is-right has-text-danger"
               data-cy="ErrorIcon"
@@ -93,7 +97,7 @@ export const NewCommentForm: React.FC<Props> = ({
           )}
         </div>
 
-        {formErrors.email && (
+        {fieldErrors.email && (
           <p className="help is-danger" data-cy="ErrorMessage">
             Email is required
           </p>
@@ -108,17 +112,18 @@ export const NewCommentForm: React.FC<Props> = ({
         <div className="control">
           <textarea
             value={formFiedls.body}
-            onChange={e =>
-              onFieldsChange(prev => ({ ...prev, body: e.target.value }))
-            }
+            onChange={e => {
+              onFieldsChange(prev => ({ ...prev, body: e.target.value }));
+              setFieldErrors(prev => ({ ...prev, body: false }));
+            }}
             id="comment-body"
             name="body"
             placeholder="Type comment here"
-            className={cn('textarea', formErrors.body && 'is-danger')}
+            className={cn('textarea', fieldErrors.body && 'is-danger')}
           />
         </div>
 
-        {formErrors.body && (
+        {fieldErrors.body && (
           <p className="help is-danger" data-cy="ErrorMessage">
             Enter some text
           </p>
